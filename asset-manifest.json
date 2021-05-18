@@ -1,0 +1,23 @@
+{
+  "files": {
+    "main.css": "/jogo-forca-middleware/static/css/main.ca1006e3.chunk.css",
+    "main.js": "/jogo-forca-middleware/static/js/main.57709f02.chunk.js",
+    "main.js.map": "/jogo-forca-middleware/static/js/main.57709f02.chunk.js.map",
+    "runtime-main.js": "/jogo-forca-middleware/static/js/runtime-main.eb675952.js",
+    "runtime-main.js.map": "/jogo-forca-middleware/static/js/runtime-main.eb675952.js.map",
+    "static/js/2.b9364787.chunk.js": "/jogo-forca-middleware/static/js/2.b9364787.chunk.js",
+    "static/js/2.b9364787.chunk.js.map": "/jogo-forca-middleware/static/js/2.b9364787.chunk.js.map",
+    "static/js/3.d91218bf.chunk.js": "/jogo-forca-middleware/static/js/3.d91218bf.chunk.js",
+    "static/js/3.d91218bf.chunk.js.map": "/jogo-forca-middleware/static/js/3.d91218bf.chunk.js.map",
+    "index.html": "/jogo-forca-middleware/index.html",
+    "static/css/main.ca1006e3.chunk.css.map": "/jogo-forca-middleware/static/css/main.ca1006e3.chunk.css.map",
+    "static/js/2.b9364787.chunk.js.LICENSE.txt": "/jogo-forca-middleware/static/js/2.b9364787.chunk.js.LICENSE.txt",
+    "static/media/logo.6ce24c58.svg": "/jogo-forca-middleware/static/media/logo.6ce24c58.svg"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.eb675952.js",
+    "static/js/2.b9364787.chunk.js",
+    "static/css/main.ca1006e3.chunk.css",
+    "static/js/main.57709f02.chunk.js"
+  ]
+}
