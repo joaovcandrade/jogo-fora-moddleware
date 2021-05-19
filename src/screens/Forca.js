@@ -4,6 +4,7 @@ import { qwerty_alphabet } from "../assets/json/qwert.json";
 import { roullete } from "../assets/json/roullete.json";
 import { Button } from "@chakra-ui/react";
 import React, { useState, useEffect } from "react";
+
 import {
   Stack,
   Box,
@@ -23,90 +24,127 @@ import { PinInput, PinInputField } from "@chakra-ui/react";
 import { words } from "../assets/json/words.json";
 import Confetti from "react-confetti";
 import AlertDialogComponent from "./Components/Alert";
+import { useToast } from "@chakra-ui/react";
 
-class Forca extends React.Component {
-  constructor(props) {
-    super(props);
-    let selected = words[this.getRandomInt(0, words.length)];
-    this.state = {
-      secretWord: selected.word.toUpperCase(),
-      tip: selected.tip,
-      already_chosen_letters: [],
-      word_placeholder: this.generatePlaceholder(selected.word),
-      players: ["Jogador 1", "Jogador 2", "Jogador 3"],
-      points: [0, 0, 0],
-      roullete_value: this.runRollete(),
-      round: this.getRandomInt(0, 2),
-      end_game: false,
-    };
-  }
+function Forca(props) {
+  const toast = useToast();
 
-  runRollete() {
+  const runRoullete = () => {
     return roullete[Math.floor(Math.random() * roullete.length)];
-  }
+  };
 
-  getRandomInt(min, max) {
+  const getRandomInt = (min, max) => {
     min = Math.ceil(min);
     max = Math.floor(max);
     return Math.floor(Math.random() * (max - min)) + min;
-  }
+  };
 
-  generatePlaceholder(word) {
+  const generatePlaceholder = (word) => {
     let placeholder = "";
     word.split("").forEach((letter) => {
       placeholder += " _ ";
     });
 
     return placeholder;
-  }
+  };
 
-  choiceLetter(letter) {
-    let new_chosen_letters = [...this.state.already_chosen_letters, letter];
+  const choiceLetter = (letter) => {
+    let new_chosen_letters = [...state.already_chosen_letters, letter];
     let new_word_placeholder = "";
     let new_round;
     let new_points;
+    let new_roullete = runRoullete();
 
-    let letter_match = this.state.secretWord.indexOf(letter);
+    let letter_match = state.secretWord.indexOf(letter);
+
     if (letter_match >= 0) {
-      this.state.secretWord.split("").forEach((letter) => {
+      state.secretWord.split("").forEach((letter) => {
         let match = new_chosen_letters.includes(letter);
         new_word_placeholder += match ? letter : " _ ";
       });
-      new_round = this.state.round;
-      new_points = [...this.state.points];
-      new_points[this.state.round] += this.state.roullete_value;
+      new_round = state.round;
+      new_points = [...state.points];
+      new_points[state.round] += state.roullete_value;
+      toast.closeAll();
+      toast({
+        title: "Wohoo!",
+        description: `Acertou! ${state.players[state.round]} ganhou ${
+          state.roullete_value
+        } pontos`,
+        position: "top-right",
+        status: "success",
+        duration: 2000,
+        isClosable: true,
+      });
+      setTimeout(() => {
+        toast({
+          title: "Continue",
+          description: `${state.players[new_round]} tente mais uma letra`,
+          position: "top-right",
+          status: "warning",
+          duration: null,
+          isClosable: true,
+        });
+      }, 2000);
     } else {
-      new_round = this.state.round + 1 > 2 ? 0 : this.state.round + 1;
-      new_word_placeholder = this.state.word_placeholder;
+      new_round = state.round + 1 > 2 ? 0 : state.round + 1;
+      new_word_placeholder = state.word_placeholder;
 
-      new_points = [...this.state.points];
+      new_points = [...state.points];
+      toast.closeAll();
+      toast({
+        title: "Oops!",
+        description: "Acho que não",
+        position: "top-right",
+        status: "error",
+        duration: 2000,
+        isClosable: true,
+      });
+      setTimeout(() => {
+        toast({
+          title: "Próximo!",
+          description: `${state.players[new_round]} agora é sua vez!`,
+          position: "top-right",
+          status: "warning",
+          duration: null,
+          isClosable: true,
+        });
+        toast({
+          title: `Valendo ${new_roullete} pontos`,
+          description: ``,
+          position: "top-right",
+          status: "warning",
+          duration: 3000,
+          isClosable: true,
+        });
+      }, 2000);
     }
 
-    this.setState({
-      already_chosen_letters: [...this.state.already_chosen_letters, letter],
+    setState({
+      ...state,
+      already_chosen_letters: [...state.already_chosen_letters, letter],
       word_placeholder: new_word_placeholder,
-      end_game: this.state.secretWord == new_word_placeholder ? true : false,
+      end_game: state.secretWord == new_word_placeholder ? true : false,
       round: new_round,
-      roullete_value: this.runRollete(),
+      roullete_value: new_roullete,
       points: new_points,
     });
-  }
+  };
 
-  QwertyAlphabetKeyboard() {
+  const QwertyAlphabetKeyboard = () => {
     let keyboard = [];
 
     qwerty_alphabet.forEach((line) => {
       let buttons = [];
 
       line.forEach((letter) => {
-        let already_chosen = this.state.already_chosen_letters.includes(letter);
-
+        let already_chosen = state.already_chosen_letters.includes(letter);
         buttons.push(
           <Button
             colorScheme="blue"
             isDisabled={already_chosen}
             onClick={() => {
-              this.choiceLetter(letter);
+              choiceLetter(letter);
             }}
           >
             {letter}
@@ -121,15 +159,15 @@ class Forca extends React.Component {
       );
     });
     return keyboard;
-  }
+  };
 
-  renderTablePlacar() {
+  const renderTablePlacar = () => {
     let table = [];
-    this.state.players.forEach((player, index) => {
+    state.players.forEach((player, index) => {
       table.push(
         <Tr>
           <Td>{player}</Td>
-          <Td isNumeric>{this.state.points[index]}</Td>
+          <Td isNumeric>{state.points[index]}</Td>
         </Tr>
       );
     });
@@ -146,63 +184,72 @@ class Forca extends React.Component {
         </Table>
       </Box>
     );
-  }
+  };
 
-  getWindowDimensions() {
-    const { innerWidth: width, innerHeight: height } = window;
-    return {
-      width,
-      height,
-    };
-  }
+  var selected = words[getRandomInt(0, words.length)];
+  const [state, setState] = useState({
+    secretWord: selected.word.toUpperCase(),
+    tip: selected.tip,
+    already_chosen_letters: [],
+    word_placeholder: generatePlaceholder(selected.word),
+    players: ["Jogador 1", "Jogador 2", "Jogador 3"],
+    points: [0, 0, 0],
+    roullete_value: runRoullete(),
+    round: getRandomInt(0, 2),
+    end_game: false,
+  });
 
-  render() {
-    return (
-      <div className="App">
-        <header className="App-header">
-          {this.state.end_game && <Confetti />}
+  useEffect(() => {
+    toast({
+      title: "Início de jogo!",
+      description: `${state.players[state.round]} você começa.`,
+      position: "top-right",
+      status: "success",
+      duration: null,
+      isClosable: true,
+    });
+  }, []);
 
-          <Stack spacing={5} marginBottom={2}>
-            <Box w="100%" p={4} color="white">
-              <Badge width={"100%"}>
-                <Text fontSize="3xl">{this.state.tip}</Text>
-              </Badge>
-            </Box>
+  return (
+    <div className="App">
+      <header className="App-header">
+        {state?.end_game && <Confetti />}
 
-            <Text fontSize="6xl" color="success">
-              {this.state.word_placeholder}
-            </Text>
-            <Text fontSize="xl" color="white">
-              {console.log(this.state.round)}
-              {console.log(this.state.players)}
-              Vez do {this.state.players[this.state.round]}
-            </Text>
-            <Text color="gray.500" fontSize="md">
-              Valendo{" "}
-              <Badge colorScheme="green">
-                {this.state.roullete_value} pontos
-              </Badge>
-            </Text>
-          </Stack>
+        <Stack spacing={5} marginBottom={2}>
+          <Box w="100%" p={4} color="white">
+            <Badge width={"100%"}>
+              <Text fontSize="3xl">{state.tip}</Text>
+            </Badge>
+          </Box>
 
-          {this.QwertyAlphabetKeyboard()}
+          <Text fontSize="6xl" color="success">
+            {state.word_placeholder}
+          </Text>
+          <Text fontSize="xl" color="white">
+            Vez do {state.players[state.round]}
+          </Text>
+          <Text color="gray.500" fontSize="md">
+            Valendo{" "}
+            <Badge colorScheme="green">{state.roullete_value} pontos</Badge>
+          </Text>
+        </Stack>
 
-          {this.state.end_game &&
-            `${this.state.players[this.state.round]} ganhou`}
+        {QwertyAlphabetKeyboard()}
 
-          {this.renderTablePlacar()}
-        </header>
-        <AlertDialogComponent
-          isOpen={this.state.end_game}
-          title={"Fim de jogo"}
-          body={`O Jogador ${this.state.players[this.state.round]} ganhou com ${
-            this.state.points[this.state.round]
-          } pontos`}
-          opt={"Novo Jogo"}
-        />
-      </div>
-    );
-  }
+        {state.end_game && `${state.players[state.round]} ganhou`}
+
+        {renderTablePlacar()}
+      </header>
+      <AlertDialogComponent
+        isOpen={state.end_game}
+        title={"Fim de jogo"}
+        body={`O Jogador ${state.players[state.round]} ganhou com ${
+          state.points[state.round]
+        } pontos`}
+        opt={"Novo Jogo"}
+      />
+    </div>
+  );
 }
 
 export default Forca;
