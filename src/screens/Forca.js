@@ -96,6 +96,7 @@ function Forca(props) {
       setTimeout(async () => {
         if (!toast.isActive("continue")) {
           await toast.closeAll();
+
           await toast({
             id: "continue",
             title: "Continue",
@@ -156,7 +157,7 @@ function Forca(props) {
       });
     } else {
       if (
-        state.secretWord == new_word_placeholder && state.turn == 2
+        state.secretWord == new_word_placeholder && state.round == 2
           ? true
           : false
       ) {
@@ -250,7 +251,7 @@ function Forca(props) {
   const getWinnerIdx = () => {
     let winner_idx = 0;
     for (let i = 1; i < state.points.length; i++) {
-      if (state.players[winner_idx] < state.players[i]) winner_idx = i;
+      if (state.points[winner_idx] < state.points[i]) winner_idx = i;
     }
     return winner_idx;
   };
@@ -335,6 +336,14 @@ function Forca(props) {
 
           {renderTablePlacar()}
         </header>
+        <AlertDialogComponent
+          isOpen={state.end_game}
+          title={"Fim de jogo"}
+          body={`O Jogador ${state.players[getWinnerIdx()]} ganhou com ${
+            state.points[getWinnerIdx()]
+          } pontos`}
+          opt={"Novo Jogo"}
+        />
       </div>
     );
   }
