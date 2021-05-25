@@ -2,6 +2,10 @@
   "words": [
     { "word": "faca", "tip": "cozinha" },
     { "word": "pneu", "tip": "carro" },
-    { "word": "bota", "tip": "pé" }
+    { "word": "bota", "tip": "pé" },
+    { "word": "controle", "tip": "tv" },
+    { "word": "garrafa", "tip": "bebida" },
+    { "word": "carne", "tip": "açougue" },
+    { "word": "remedio", "tip": "médico" }
   ]
 }
