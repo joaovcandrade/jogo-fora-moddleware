@@ -356,7 +356,7 @@ function Forca(props) {
           style={{ position: "relative", zIndex: 9999 }}
         >
           <Center>
-            <Text fontSize="6xl">Round {state.round+1}</Text>
+            <Text fontSize="6xl">Round {state.round + 1}</Text>
           </Center>
         </header>
       </div>
