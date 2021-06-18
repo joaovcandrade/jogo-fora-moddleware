@@ -1,6 +1,8 @@
 const { uniqueNamesGenerator, adjectives, colors, animals } = require('unique-names-generator');
 const { words } = require('./json/words.json');
 const { roullete } = require("./json/roullete.json");
+const grpc = require('grpc')
+const notesProto = grpc.load('notes.proto')
 
 var round = 0;
 var all_words = choiceWords();
@@ -48,7 +50,7 @@ function choiceWords() {
     return selected;
 }
 
-function createUser(socketId) {
+function createUser(clientId) {
     let randomName = "";
     do {
         randomName = uniqueNamesGenerator({
@@ -58,11 +60,11 @@ function createUser(socketId) {
 
     } while (randomName in data_players);
 
-    if (turn_player == false) turn_player = socketId
+    if (turn_player == false) turn_player = clientId
     console.log("Turn player", turn_player)
 
-    data_players[socketId] = ({
-        "socketId": socketId,
+    data_players[clientId] = ({
+        "clientId": clientId,
         "name": randomName,
         "points": 0
     });
@@ -74,33 +76,60 @@ function createUser(socketId) {
     console.log(data_players);
 }
 
-function removeUser(socketId, emit) {
+function removeUser(clientId, emit) {
     console.log(Object.keys(data_players).length)
     if (Object.keys(data_players).length == 1) turn_player = false
     let players = Object.keys(data_players)
-    if (players.indexOf(socketId) + 1 < players.length) {
-        turn_player = players[players.indexOf(socketId) + 1]
+    if (players.indexOf(clientId) + 1 < players.length) {
+        turn_player = players[players.indexOf(clientId) + 1]
     } else {
         turn_player = players[0]
     }
-    delete data_players[socketId];
+    delete data_players[clientId];
     roullete_value = runRoullete()
     emit()
 }
 
-
-const httpServer = require("http").createServer();
-const io = require("socket.io")(httpServer, {
-    cors: {
-        origin: "http://localhost:3000",
+const server = new grpc.Server();
+server.addService(notesProto.ForcaService.service, {
+    start: async (_, callback) => {
+        await createUser(socket.id);
+        callback(null, notes)
     },
-});
 
+    disconect: async (_, callback) => {
+        await createUser(socket.id);
+        callback(null, notes)
+    },
+
+    update: async (_, callback) => {
+        await createUser("socket.id");
+        let data = {
+            round,
+            all_words,
+            word,
+            tip,
+            partial_word,
+            turn_player,
+            already_chosen_letters,
+            roullete_value,
+            data_players,
+            end_game
+        }
+        callback(null, data)
+    }
+})
+
+server.bind('127.0.0.1:3002', grpc.ServerCredentials.createInsecure())
+console.log('Server running at http://127.0.0.1:3002')
+server.start()
+
+
+/*
 io.on("connection", async (socket) => {
 
     socket.join("room1")
 
-    await createUser(socket.id);
 
     const emit = () => {
         io.to('room1').emit("update", {
@@ -181,5 +210,4 @@ io.on("connection", async (socket) => {
 io.onmessage = (data) => {
     console.log(data);
 };
-
-httpServer.listen(3002);
+ */

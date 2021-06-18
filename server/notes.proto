@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+service ForcaService {
+    rpc List (Empty) returns (ForcaUpdate) {}
+}
+
+message Empty {}
+
+message ForcaUpdate {
+   int32 round = 1;
+   repeated string all_words = 2;
+   string word = 3;
+   string tip = 4;
+   string partial_word = 5;
+   string turn_player = 6;
+   repeated string already_chosen_letters = 7;
+   int32 roullete_value = 8;
+   DataPlayers data_players = 9;
+   bool end_game = 10;
+}
+
+message Players {
+   
+   string clientId = 1;
+   string randomName = 2;
+   int32 points = 3;
+  
+}
+
+message DataPlayers {
+   repeated Players data_playes = 1;
+}

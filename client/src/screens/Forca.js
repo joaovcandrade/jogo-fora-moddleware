@@ -25,6 +25,8 @@ import Confetti from "react-confetti";
 import AlertDialogComponent from "./Components/Alert";
 import { useToast } from "@chakra-ui/react";
 import { io } from "socket.io-client";
+import client from "../client-grpc"
+
 
 
 
@@ -49,16 +51,13 @@ function Forca(props) {
   });
 
   useEffect(() => {
-    socket.on("connect", () => {
-      user_id = socket.id
-      console.log("Conectado!")
-    });
-    socket.on("update", async data => {
-      console.log(data);
-
-      await setState(data);
-      setLoading(false);
-    });
+    client.update({}, (error, notes) => {
+      if (!error) {
+        console.log(notes)
+      } else {
+        console.error(error)
+      }
+    })
 
 
   }, [])
