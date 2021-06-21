@@ -24,18 +24,13 @@ import { words } from "../assets/json/words.json";
 import Confetti from "react-confetti";
 import AlertDialogComponent from "./Components/Alert";
 import { useToast } from "@chakra-ui/react";
-import { io } from "socket.io-client";
-import client from "../client-grpc"
-
-
-
-
-const socket = io("http://localhost:3002");
+const jaysonPromiseBrowserClient = require('jayson/promise/lib/client/browser');
+const fetch = require('node-fetch');
 
 
 function Forca(props) {
 
-  var user_id = null
+  const [user_id, setUser_id] = useState("0");
   const [loading, setLoading] = useState(true);
   const [state, setState] = useState({
     "round": null,
@@ -50,32 +45,74 @@ function Forca(props) {
     "end_game": null
   });
 
-  useEffect(() => {
-    client.update({}, (error, notes) => {
-      if (!error) {
-        console.log(notes)
-      } else {
-        console.error(error)
+  const callServer = function(request) {
+    const options = {
+      method: 'POST',
+      body: request,
+      headers: {
+        'Content-Type': 'application/json',
       }
-    })
+    };
+    return fetch('http://localhost:3001', options).then(res => res.text());
+  };
+  
+  const client = new jaysonPromiseBrowserClient(callServer, {
+    // other options go here
+  });
 
+  useEffect(() => {    
+
+    
+    start()
 
   }, [])
 
+  const start = () => {
+    client.request('start', null, async function(err, error, result) {
+      if(err) {
+        start()
+      }else{
+        await setUser_id(result.user_id)
+        await setState(result.data);
+        await setLoading(false);
+        getUpdate()
+      }      
+    });
+
+  }
 
 
+  
+
+  const getUpdate = () => {
+    
+
+    client.request('update', null, async function(err, error, result) {
+      if(err) {
+        getUpdate()
+      }else{
+        await setState(result);
+      }
+    });
+
+    setInterval(() => {
+      getUpdate()
+    }, 10000);
+
+  }
 
 
-  useEffect(() => {
-    console.log("ATUALIZOU", state);
-  }, state)
 
 
   const choiceLetter = (letter) => {
-    socket.emit("letter", letter)
-    if (user_id == state.turn_player) {
 
-    }
+    client.request('choice_letter', {"letter": letter, "user_id": user_id},function(err, error,result) {
+      if(err) {
+        choiceLetter(letter)
+      }else{
+        getUpdate()
+     }
+    });
 
   }
 
@@ -158,7 +195,7 @@ function Forca(props) {
         <header className="App-header">
 
           <Stack spacing={5} marginBottom={2}>
-            <Text>Jogador {state.data_players[socket.id].name}</Text>
+            <Text>Jogador {state.data_players[user_id].name}</Text>
 
             <Box w="100%" p={4} color="white">
               <Badge width={"100%"}>
@@ -170,8 +207,8 @@ function Forca(props) {
               {state.partial_word}
             </Text>
             <Text fontSize="xl" color="white">
-              {(socket.id == state.turn_player) && "Sua vez"}
-              {(socket.id != state.turn_player) && "Vez de " + state.data_players[state.turn_player].name}
+              {(user_id === state.turn_player) && "Sua vez"}
+              {(user_id !== state.turn_player) && "Vez de " + state.data_players[state.turn_player].name}
 
             </Text>
             <Text color="gray.500" fontSize="md">

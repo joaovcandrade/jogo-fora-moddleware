@@ -1,9 +1,14 @@
 const { uniqueNamesGenerator, adjectives, colors, animals } = require('unique-names-generator');
 const { words } = require('./json/words.json');
 const { roullete } = require("./json/roullete.json");
-const grpc = require('grpc')
-const notesProto = grpc.load('notes.proto')
+const cors = require('cors');
+const jayson = require('jayson');
+const connect = require('connect');
+const jsonParser = require('body-parser').json;
+const app = connect();
 
+
+var counter = Date.now();
 var round = 0;
 var all_words = choiceWords();
 var word = all_words[round].word;
@@ -50,7 +55,7 @@ function choiceWords() {
     return selected;
 }
 
-function createUser(clientId) {
+function createUser() {
     let randomName = "";
     do {
         randomName = uniqueNamesGenerator({
@@ -60,20 +65,24 @@ function createUser(clientId) {
 
     } while (randomName in data_players);
 
-    if (turn_player == false) turn_player = clientId
+    if (turn_player == false) {
+        counter = Date.now()-5000;
+        turn_player = randomName;
+    }
     console.log("Turn player", turn_player)
 
-    data_players[clientId] = ({
-        "clientId": clientId,
+    data_players[randomName] = ({
+        "clientId": randomName,
         "name": randomName,
         "points": 0
     });
 
     if (data_players.length == 0) {
-        turn_player = socket.id;
+        turn_player = randomName;
     }
 
     console.log(data_players);
+    return  randomName
 }
 
 function removeUser(clientId, emit) {
@@ -87,23 +96,15 @@ function removeUser(clientId, emit) {
     }
     delete data_players[clientId];
     roullete_value = runRoullete()
-    emit()
 }
 
-const server = new grpc.Server();
-server.addService(notesProto.ForcaService.service, {
+const server = new jayson.server({
+    add: function(args, callback) {
+      callback(null, args[0] + args[1]);
+    },
+
     start: async (_, callback) => {
-        await createUser(socket.id);
-        callback(null, notes)
-    },
-
-    disconect: async (_, callback) => {
-        await createUser(socket.id);
-        callback(null, notes)
-    },
-
-    update: async (_, callback) => {
-        await createUser("socket.id");
+        let client_id = await createUser();
         let data = {
             round,
             all_words,
@@ -116,13 +117,91 @@ server.addService(notesProto.ForcaService.service, {
             data_players,
             end_game
         }
+        callback(null, {"user_id": client_id, "data": data})
+    },
+
+    disconect: async (user_id, callback) => {
+        console.log("removi ", user_id)
+        removeUser(user_id)
+        callback(null, notes)
+    },
+
+    choice_letter:  async (data, callback) => {
+        letter = data.letter.toLowerCase()
+        if (data.user_id == turn_player) {
+            counter = Date.now();
+            if (word.split('').includes(letter)) {
+                already_chosen_letters.push(letter)
+                partial_word = placeholder(letter)
+                data_players[data.user_id]["points"] += roullete_value
+                roullete_value = runRoullete()
+                if (partial_word.split(' ').indexOf('_') < 0) {
+                    round = round + 1;
+                    if (round > 2) {
+                        round = 0;
+                        all_words = choiceWords();
+                        end_game = true
+                        setTimeout(async () => {
+                            end_game = false
+                        }, 5000);
+                        let players = Object.keys(data_players);
+                        players.forEach(p => {
+                            data_players[p].points = 0;
+                        });
+                    }
+                    word = all_words[round].word;
+                    tip = all_words[round].tip;
+                    partial_word = initialPlaceholder(word);
+                    already_chosen_letters = [];
+                }
+            } else {
+
+                let players = Object.keys(data_players)
+                if (players.indexOf(data.user_id) + 1 < players.length) {
+                    turn_player = players[players.indexOf(data.user_id) + 1]
+                } else {
+                    turn_player = players[0]
+                }
+                roullete_value = runRoullete()
+
+            }
+        } else {
+            console.log("Not turn of ", data.user_id)
+        }
+
+        callback(null, null)
+
+    },
+
+    update: async (_, callback) => {
+        let date_now = Date.now()
+        let diff_time = date_now - counter // tempo decorrido em milisegundos
+        console.log(diff_time)
+        if (diff_time >= 30000){
+            removeUser(turn_player);
+            counter = Date.now();
+        }
+        let data = {
+            round,
+            all_words,
+            word,
+            tip,
+            partial_word,
+            turn_player,
+            already_chosen_letters,
+            roullete_value,
+            data_players,
+            end_game
+        }        
         callback(null, data)
     }
-})
+});
 
-server.bind('127.0.0.1:3002', grpc.ServerCredentials.createInsecure())
-console.log('Server running at http://127.0.0.1:3002')
-server.start()
+app.use(cors({methods: ['POST']}));
+app.use(jsonParser());
+app.use(server.middleware());
+
+app.listen(3001);
 
 
 /*

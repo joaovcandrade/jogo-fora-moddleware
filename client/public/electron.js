@@ -10,6 +10,7 @@ function createWindow() {
     height: 1080,
     webPreferences: {
       nodeIntegration: true,
+      enableRemoteModule: true
     },
   });
 
@@ -45,3 +46,4 @@ app.on("activate", () => {
     createWindow();
   }
 });
+
