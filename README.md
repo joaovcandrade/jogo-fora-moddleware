@@ -1,5 +1,5 @@
 # Instruções do projeto
-Jogo da forca para implementação de modalidades de middleware
+Jogo da forca para implementação de modalidades de middlewares
 
 ## Instruções de execução cliente 
 Para toda as versões existem um executável cliente anexado nas tags (electron), porém testada somente na versão windows (.exe).
