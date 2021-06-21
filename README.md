@@ -37,3 +37,32 @@ yarn install
 yarn start
 ```
 
+# Tech stack
+
+## V1.0
+- React.js
+- Node.js
+- Electron
+- Yarn
+
+## V2.0
+- React.js
+- Node.js
+- Electron
+- Yarn
+- Websocket
+
+## V3.0
+- React.js
+- Node.js
+- Electron
+- Yarn
+- js-RPC (jayson)
+
+## V4.0
+- React.js
+- Node.js
+- Electron
+- Yarn
+- RabbitMQ - Stomp
+
