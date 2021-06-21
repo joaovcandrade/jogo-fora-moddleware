@@ -1,16 +1,39 @@
-# Executando o projeto
+# Instruções do projeto
 
-Instale as dependências via gerenciador de pacotes. Neste exemplo usaremos o yarn
+Para toda as versões existem um executável cliente anexado nas tags (electron), porém testada somente na versão windows (.exe).
+Para abrir o executável no windows, siga os seguintes passos:
+
+1 -  Baixe a versão correspondete nas tags e extraia o arquivo.
+
+2 - Na raíz do arquivo extraído execute forca.exe
+
+
+## Instruções de execução servidor 
+
+### V1.0
+Não necessita de servidor, o executável contém o jogo completo.
+
+### V2.0, V3.0 e V4.0
+Necessita de um servidor em execução.
+O servidor têm como pré requisito a instalação do node.js 14.17.1 LTS e yarn.
+O servidor estará disponível em endereço local na porta 3000.
+
+Para iniciar o servidor, siga os seguintes passos:
+
+1 - Clone este projeto e vá até a branch correspondente a versão em que deseja testar (v2,v3 ou v4)
+
+2 - No diretório raiz do projeto navegue até /server
 ```
-yarn
+cd server
 ```
 
-Inicie o electron em desenvolvimento
+3 - instale as dependências yarn install
 ```
-yarn dev
+yarn install
 ```
 
-Em um novo terminal, inicie o servidor de desenvolvimento
+4 - Execute o servidor com 
 ```
 yarn start
 ```
+
