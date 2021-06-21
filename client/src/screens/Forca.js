@@ -267,6 +267,7 @@ function Forca(props) {
     return renderLoading();
   } else {
     if (!state.end_game) {
+      getUpdate();
       return renderGame();
     } else {
       return renderEndGame()
