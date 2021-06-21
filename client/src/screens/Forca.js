@@ -95,10 +95,10 @@ function Forca(props) {
       }
     });
 
-    setInterval(() => {
-      getUpdate()
-    }, 10000);
 
+    setTimeout(() => {
+      getUpdate()
+    }, 1000);
   }
 
 
@@ -110,7 +110,7 @@ function Forca(props) {
       if(err) {
         choiceLetter(letter)
       }else{
-        getUpdate()
+        //getUpdate()
      }
     });
 
@@ -267,7 +267,7 @@ function Forca(props) {
     return renderLoading();
   } else {
     if (!state.end_game) {
-      getUpdate();
+      //getUpdate();
       return renderGame();
     } else {
       return renderEndGame()
