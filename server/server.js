@@ -176,7 +176,6 @@ const server = new jayson.server({
     update: async (_, callback) => {
         let date_now = Date.now()
         let diff_time = date_now - counter // tempo decorrido em milisegundos
-        console.log(diff_time)
         if (diff_time >= 30000){
             removeUser(turn_player);
             counter = Date.now();
