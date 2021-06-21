@@ -98,7 +98,7 @@ function Forca(props) {
 
     setTimeout(() => {
       getUpdate()
-    }, 1000);
+    }, 500);
   }
 
 
