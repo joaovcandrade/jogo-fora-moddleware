@@ -49,7 +49,7 @@ Quão difícil seria implementar uma modalidade de jogo em que cada jogador pode
 
 Novamente, quão complicado seria implementar a versão em tempo real do jogo, utilizando RPC? 
 
-Difícil, pois é complicado abstrar o tempo real a quem realiza a chamada de um método no servidor e considerar como local, inclusive tratar erros de rede sem quebrar a asbstração do RPC.
+Difícil, pois é complicado abstrar o tempo real a quem realiza a chamada de um método no servidor e considerar como local, inclusive tratar erros de rede sem quebrar as abstrações do RPC.
 
 # Tech stack
 
