@@ -39,6 +39,18 @@ yarn install
 yarn start
 ```
 
+# Perguntas
+
+Quão difícil seria implementar uma modalidade de jogo em que cada jogador pode responder ao mesmo tempo, aquele que responder certo primeiro ganha o prêmio, e os que responderem errado perdem pontos? 
+ 
+É necessário tratar a sincronização de relógio, definir tolerância de tempo para acertar quem enviou a mensagem primeiro e previnir as excecoes que podem ocorrer na rede. Sendo assim, é necessário tratar esses pontos e consideramos não trivial caso não esteja utilizando uma biblioteca que realiza este trabalho.
+
+
+
+Novamente, quão complicado seria implementar a versão em tempo real do jogo, utilizando RPC? 
+
+Difícil, pois é complicado abstrar o tempo real a quem realiza a chamada de um método no servidor e considerar como local, inclusive tratar erros de rede sem quebrar a asbstração do RPC.
+
 # Tech stack
 
 ## V1.0
